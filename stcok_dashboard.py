@@ -111,66 +111,66 @@ if st.sidebar.button("Add to Portfolio"):
 #***************POST STOCK ADDITION PNL CHARTING***********************
 
 
-PnL = generate_pnl(st.session_state.portfolio)
+    PnL = generate_pnl(st.session_state.portfolio)
 
-initial_investment = st.session_state.portfolio['Buy MV'].sum()
-latest_prices = PnL.groupby('ticker').apply(lambda x: x.iloc[-1])  
-current_market_value = (latest_prices['Close'] * latest_prices['quantity']).sum()
-total_pnl = current_market_value - initial_investment
+    initial_investment = st.session_state.portfolio['Buy MV'].sum()
+    latest_prices = PnL.groupby('ticker').apply(lambda x: x.iloc[-1])  
+    current_market_value = (latest_prices['Close'] * latest_prices['quantity']).sum()
+    total_pnl = current_market_value - initial_investment
 
-pnl_color = "#28B463" if total_pnl > 0 else "#C0392B" if total_pnl < 0 else "#7F8C8D"
+    pnl_color = "#28B463" if total_pnl > 0 else "#C0392B" if total_pnl < 0 else "#7F8C8D"
 
 
-col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
 
-with col1:
-    st.markdown(f"""
-            <div style='text-align: center;'>
-                <h3 style='color:#2E86C1;'>Initial Investment</h3>
-                <h2>${initial_investment:,.2f}</h2>
-            </div>
-        """, unsafe_allow_html=True)
+    with col1:
+        st.markdown(f"""
+                <div style='text-align: center;'>
+                    <h3 style='color:#2E86C1;'>Initial Investment</h3>
+                    <h2>${initial_investment:,.2f}</h2>
+                </div>
+            """, unsafe_allow_html=True)
 
-with col2:
-    st.markdown(f"""
-            <div style='text-align: center;'>
-                <h3 style='color:#2E86C1;'>Current Market Value</h3>
-                <h2>${current_market_value:,.2f}</h2>
-            </div>
-        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+                <div style='text-align: center;'>
+                    <h3 style='color:#2E86C1;'>Current Market Value</h3>
+                    <h2>${current_market_value:,.2f}</h2>
+                </div>
+            """, unsafe_allow_html=True)
 
-with col3:
-    st.markdown(f"""
-            <div style='text-align: center;'>
-                <h3 style='color:{pnl_color};'>PnL</h3>
-                <h2 style='color:{pnl_color};'>${total_pnl:,.2f}</h2>
-            </div>
-        """, unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"""
+                <div style='text-align: center;'>
+                    <h3 style='color:{pnl_color};'>PnL</h3>
+                    <h2 style='color:{pnl_color};'>${total_pnl:,.2f}</h2>
+                </div>
+            """, unsafe_allow_html=True)
 
-# Show current portfolio
-st.subheader("Current Portfolio")
-st.dataframe(st.session_state.portfolio)
+    # Show current portfolio
+    st.subheader("Current Portfolio")
+    st.dataframe(st.session_state.portfolio)
 
-#Chart PNL
-if not st.session_state.portfolio.empty:
-    # Plot
-    fig = px.line(
-    PnL,
-    x='date',
-    y='cum_pnl',
-    color='ticker',
-    title='Cumulative PnL per Ticker',
-    markers=True,
-    hover_data=['Close', 'quantity', 'daily_change']
-    )
+    #Chart PNL
+    if not st.session_state.portfolio.empty:
+        # Plot
+        fig = px.line(
+        PnL,
+        x='date',
+        y='cum_pnl',
+        color='ticker',
+        title='Cumulative PnL per Ticker',
+        markers=True,
+        hover_data=['Close', 'quantity', 'daily_change']
+        )
 
-    fig.update_layout(
-        xaxis_title='Date',
-        yaxis_title='Cumulative PnL ($)',
-        hovermode='x unified'
-    )
+        fig.update_layout(
+            xaxis_title='Date',
+            yaxis_title='Cumulative PnL ($)',
+            hovermode='x unified'
+        )
 
-    st.plotly_chart(fig)
+        st.plotly_chart(fig)
 
-    st.subheader("Current PnL")
-    st.dataframe(PnL)
+        st.subheader("Current PnL")
+        st.dataframe(PnL)
