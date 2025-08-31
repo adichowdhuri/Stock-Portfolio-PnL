@@ -36,4 +36,4 @@ if st.button("Add to Portfolio"):
 
 # Show current portfolio
 st.subheader("Current Portfolio")
-st.dataframe(st.session_state.portfolio["Ticker", "Buy Date", "Buy Price", "Quantity"])
+st.dataframe(st.session_state.portfolio[["Ticker", "Buy Date", "Buy Price", "Quantity"]])
