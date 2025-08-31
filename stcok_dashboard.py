@@ -109,14 +109,20 @@ if st.sidebar.button("Add to Portfolio"):
 
 
 PnL = generate_pnl(st.session_state.portfolio)
+
 initial_investment = st.session_state.portfolio['Buy MV'].sum()
-latest_prices = PnL.groupby('ticker').apply(lambda x: x.iloc[-1])  # last row for each ticker
+latest_prices = PnL.groupby('ticker').apply(lambda x: x.iloc[-1])  
 current_market_value = (latest_prices['Close'] * latest_prices['quantity']).sum()
+total_pnl = current_market_value - initial_investment
+
+pnl_color = "#28B463" if total_pnl > 0 else "#C0392B" if total_pnl < 0 else "#7F8C8D"
+
 
 st.markdown(f"""
         <h2 style='text-align: center; color: #2E86C1;'>Initial Investment: ${initial_investment:,.2f}</h2>
         <h2 style='text-align: center; color: #28B463;'>Current Market Value: ${current_market_value:,.2f}</h2>
-""", unsafe_allow_html=True)
+        <h2 style='text-align: center; color: {pnl_color};'>PnL: ${total_pnl:,.2f}</h2>
+    """, unsafe_allow_html=True)
 
 # Show current portfolio
 st.subheader("Current Portfolio")
