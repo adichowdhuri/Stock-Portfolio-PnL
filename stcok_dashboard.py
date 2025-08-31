@@ -131,7 +131,7 @@ with col1:
 with col2:
     st.markdown(f"""
             <div style='text-align: center;'>
-                <h3 style='color:#28B463;'>Current Market Value</h3>
+                <h3 style='color:#2E86C1;'>Current Market Value</h3>
                 <h2>${current_market_value:,.2f}</h2>
             </div>
         """, unsafe_allow_html=True)
