@@ -149,7 +149,7 @@ if st.sidebar.button("Add to Portfolio"):
 
     # Show current portfolio
     st.subheader("Current Portfolio")
-    st.dataframe(st.session_state.portfolio)
+    st.dataframe(st.session_state.portfolio.reset_index(drop=True))
 
     #Chart PNL
     if not st.session_state.portfolio.empty:
@@ -173,4 +173,4 @@ if st.sidebar.button("Add to Portfolio"):
         st.plotly_chart(fig)
 
         st.subheader("Current PnL")
-        st.dataframe(PnL)
+        st.dataframe(PnL.reset_index(drop=True))
