@@ -50,7 +50,6 @@ if not st.session_state.portfolio.empty:
     portfolio_values = pd.Series(0, index=data.index)
     for i, row in st.session_state.portfolio.iterrows():
         stock_data = data[row["Ticker"]]
-        stock_data = stock_data / stock_data.loc[row["Buy Date"]] * row["Buy Price"]  # normalize
         portfolio_values += stock_data * row["Quantity"]
 
     # Fetch benchmark (S&P 500)
