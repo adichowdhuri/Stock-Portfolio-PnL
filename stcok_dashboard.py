@@ -83,22 +83,22 @@ if "portfolio" not in st.session_state:
     st.session_state.portfolio = pd.DataFrame(columns=["Ticker", "Buy Date", "Buy Price", "Quantity"])
 
 # Portfolio Entry
-st.header("Add to Portfolio")
-ticker = st.text_input("Stock Ticker (e.g., AAPL)")
-buy_date = st.date_input("Buy Date", date(2023, 2, 1))
-quantity = st.number_input("Quantity", 1, step=1)
+st.sidebar.header("Add to Portfolio")
+ticker = st.sidebar.text_input("Stock Ticker (e.g., AAPL)")
+buy_date = st.sidebar.date_input("Buy Date", date(2023, 2, 1))
+quantity = st.sidebar.number_input("Quantity", 1, step=1)
 
 default_price = 0.0
 if ticker and buy_date:
     try:
         default_price = pull_default_price(ticker=ticker, buy_date=buy_date)
     except Exception as e:
-        st.warning(f"Could not fetch price: {e}")
+        st.sidebar.warning(f"Could not fetch price: {e}")
 
 # Allow user to override default price
-buy_price = st.number_input("Buy Price", value=default_price)
+buy_price = st.sidebar.number_input("Buy Price", value=default_price)
 
-if st.button("Add to Portfolio"):
+if st.sidebar.button("Add to Portfolio"):
     if ticker and buy_price:
         st.session_state.portfolio = add_to_portfolio(ticker=ticker, buy_date=buy_date, quantity=quantity, buy_price=buy_price, portfolio=st.session_state.portfolio)
 
