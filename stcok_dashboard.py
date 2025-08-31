@@ -107,9 +107,6 @@ if st.sidebar.button("Add to Portfolio"):
 
 #***************POST STOCK ADDITION PNL CHARTING***********************
 
-# Show current portfolio
-st.subheader("Current Portfolio")
-st.dataframe(st.session_state.portfolio)
 
 PnL = generate_pnl(st.session_state.portfolio)
 initial_investment = st.session_state.portfolio['Buy MV'].sum()
@@ -120,6 +117,10 @@ st.markdown(f"""
         <h2 style='text-align: center; color: #2E86C1;'>Initial Investment: ${initial_investment:,.2f}</h2>
         <h2 style='text-align: center; color: #28B463;'>Current Market Value: ${current_market_value:,.2f}</h2>
 """, unsafe_allow_html=True)
+
+# Show current portfolio
+st.subheader("Current Portfolio")
+st.dataframe(st.session_state.portfolio)
 
 #Chart PNL
 if not st.session_state.portfolio.empty:
