@@ -44,7 +44,7 @@ if not st.session_state.portfolio.empty:
     today = date.today()
 
     # Fetch historical prices
-    data = yf.download(tickers, start=start_date, end=today)["Adj Close"]
+    data = yf.download(tickers, start=start_date, end=today)["Close"]
 
     # Calculate portfolio value over time
     portfolio_values = pd.Series(0, index=data.index)
