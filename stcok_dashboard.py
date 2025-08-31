@@ -72,6 +72,9 @@ def generate_pnl(portfolio):
 
     pnl = pnl[['date', 'ticker', 'Close', 'quantity', 'cum_pnl', 'daily_change']]
     print(pnl.index)
+
+    if not pnl_list:
+        return pd.DataFrame(columns=['date', 'ticker', 'Close', 'quantity', 'cum_pnl', 'daily_change'])
  
     return pd.DataFrame(pnl)
 
