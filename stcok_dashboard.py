@@ -32,7 +32,7 @@ buy_price = st.number_input("Buy Price", value=default_price)
 
 if st.button("Add to Portfolio"):
     if ticker and buy_price:
-        new_row = {"Ticker": ticker, "Buy Date": buy_date, "Buy Price": buy_price, "Quantity": quantity}
+        new_row = pd.DataFrame({"Ticker": ticker, "Buy Date": buy_date, "Buy Price": buy_price, "Quantity": quantity})
         st.session_state.portfolio = st.session_state.portfolio.append(new_row, ignore_index=True)
 
 # Show current portfolio
