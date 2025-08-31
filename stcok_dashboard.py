@@ -5,7 +5,6 @@ import pandas as pd
 import yfinance as yf
 from datetime import date, timedelta
 
-pnl_values = 0
 
 st.title("Portfolio PnL Dashboard")
 st.set_page_config(page_title="Portfolio PnL", page_icon="📈")
@@ -47,6 +46,8 @@ if not st.session_state.portfolio.empty:
 
     # Fetch historical prices
     data = yf.download(tickers, start=start_date, end=today)["Close"]
+
+    pnl_values = pd.Series(0.0, index=data.index)
 
     # Calculate portfolio value over time
     portfolio_values = pd.Series(0, index=data.index)
