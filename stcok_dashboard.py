@@ -123,7 +123,6 @@ st.markdown(f"""
 
 #Chart PNL
 if not st.session_state.portfolio.empty:
-    PnL
     # Plot
     fig = px.line(
     PnL,
