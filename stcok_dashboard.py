@@ -50,14 +50,24 @@ if not st.session_state.portfolio.empty:
     portfolio_values = pd.Series(0, index=data.index)
     for i, row in st.session_state.portfolio.iterrows():
         stock_data = data[row["Ticker"]]
-        portfolio_values += stock_data * row["Quantity"]
+        pnl_values += (stock_data - row["Buy Price"]) * row["Quantity"]
 
     # Fetch benchmark (S&P 500)
     sp500 = yf.download("^GSPC", start=start_date, end=today)["Close"]
+    initial_investment = (st.session_state.portfolio["Buy Price"] * st.session_state.portfolio["Quantity"]).sum()
+
+    # Calculate how many units of S&P 500 you could buy on start_date
+    sp500_start_price = sp500.iloc[0]
+    sp500_units = initial_investment / sp500_start_price
+
+    # Calculate S&P PnL over time
+    sp500_pnl = (sp500 - sp500_start_price) * sp500_units
+
+
     portfolio_values = portfolio_values.squeeze()
     sp500 = sp500.squeeze()
 
     # Plot
-    df_plot = pd.DataFrame({"Portfolio": portfolio_values, "S&P 500": sp500})
+    df_plot = pd.DataFrame({"Portfolio": pnl_values, "S&P 500": sp500_pnl})
     fig = px.line(df_plot, x=df_plot.index, y=df_plot.columns, title="Portfolio vs S&P 500")
     st.plotly_chart(fig)
