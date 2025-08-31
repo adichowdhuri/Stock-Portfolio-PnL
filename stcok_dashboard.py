@@ -14,7 +14,7 @@ st.session_state.portfolio = pd.DataFrame(columns=["Ticker", "Buy Date", "Buy Pr
 # Portfolio Entry
 st.header("Add to Portfolio")
 ticker = st.text_input("Stock Ticker (e.g., AAPL)")
-buy_date = st.date_input("Buy Date", date(2023, 1, 1))
+buy_date = st.date_input("Buy Date", date(2023, 2, 1))
 quantity = st.number_input("Quantity", 1, step=1)
 
 default_price = 0.0
@@ -22,7 +22,8 @@ if ticker and buy_date:
     try:
         data = yf.download(ticker, start=buy_date, end=buy_date + timedelta(days=1), progress=False)
         if not data.empty:
-            default_price = round(data.iloc[0]["Open"], 2)
+            print(data)
+            default_price = float(round(data["Open"], 2).iloc[0].iloc[0])
     except Exception as e:
         st.warning(f"Could not fetch price: {e}")
 
