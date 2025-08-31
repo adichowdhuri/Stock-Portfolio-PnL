@@ -3,7 +3,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import yfinance as yf
-import datetime as date
+from datetime import date
 
 st.title("Portfolio PnL Dashboard")
 st.set_page_config(page_title="Portfolio PnL", page_icon="📈")
