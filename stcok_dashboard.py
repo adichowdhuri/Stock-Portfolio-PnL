@@ -102,12 +102,28 @@ if st.sidebar.button("Add to Portfolio"):
     if ticker and buy_price:
         st.session_state.portfolio = add_to_portfolio(ticker=ticker, buy_date=buy_date, quantity=quantity, buy_price=buy_price, portfolio=st.session_state.portfolio)
 
+
+
+
+#***************POST STOCK ADDITION PNL CHARTING***********************
+
 # Show current portfolio
 st.subheader("Current Portfolio")
 st.dataframe(st.session_state.portfolio)
 
+PnL = generate_pnl(st.session_state.portfolio)
+initial_investment = st.session_state.portfolio['Buy MV'].sum()
+latest_prices = PnL.groupby('ticker').apply(lambda x: x.iloc[-1])  # last row for each ticker
+current_market_value = (latest_prices['Close'] * latest_prices['quantity']).sum()
+
+st.markdown(f"""
+        <h2 style='text-align: center; color: #2E86C1;'>Initial Investment: ${initial_investment:,.2f}</h2>
+        <h2 style='text-align: center; color: #28B463;'>Current Market Value: ${current_market_value:,.2f}</h2>
+""", unsafe_allow_html=True)
+
+#Chart PNL
 if not st.session_state.portfolio.empty:
-    PnL = generate_pnl(st.session_state.portfolio)
+    PnL
     # Plot
     fig = px.line(
     PnL,
