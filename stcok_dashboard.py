@@ -79,8 +79,8 @@ def generate_pnl(portfolio):
 st.title("Portfolio PnL Dashboard")
 st.set_page_config(page_title="Portfolio PnL", page_icon="📈")
 
-
-st.session_state.portfolio = pd.DataFrame(columns=["Ticker", "Buy Date", "Buy Price", "Quantity"])
+if "portfolio" not in st.session_state:
+    st.session_state.portfolio = pd.DataFrame(columns=["Ticker", "Buy Date", "Buy Price", "Quantity"])
 
 # Portfolio Entry
 st.header("Add to Portfolio")
