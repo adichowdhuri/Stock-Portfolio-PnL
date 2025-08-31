@@ -77,7 +77,7 @@ def generate_pnl(portfolio):
 
 
 st.title("Portfolio PnL Dashboard")
-st.set_page_config(page_title="Portfolio PnL", page_icon="📈")
+st.set_page_config(page_title="Portfolio PnL", page_icon="📈", layout='wide')
 
 if "portfolio" not in st.session_state:
     st.session_state.portfolio = pd.DataFrame(columns=["Ticker", "Buy Date", "Buy Price", "Quantity"])
@@ -127,5 +127,5 @@ if not st.session_state.portfolio.empty:
 
     st.plotly_chart(fig)
 
-st.subheader("Current PnL")
-st.dataframe(PnL)
+    st.subheader("Current PnL")
+    st.dataframe(PnL)
