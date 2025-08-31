@@ -66,8 +66,8 @@ if not st.session_state.portfolio.empty:
     sp500_pnl = (sp500 - sp500_start_price) * sp500_units
 
 
-    portfolio_values = portfolio_values.squeeze()
-    sp500 = sp500.squeeze()
+    pnl_values = portfolio_values.squeeze()
+    sp500_pnl = sp500.squeeze()
 
     # Plot
     df_plot = pd.DataFrame({"Portfolio": pnl_values, "S&P 500": sp500_pnl})
