@@ -16,7 +16,7 @@ st.header("Add to Portfolio")
 ticker = st.text_input("Stock Ticker (e.g., AAPL)")
 buy_date = st.date_input("Buy Date", date(2023, 2, 1))
 quantity = st.number_input("Quantity", 1, step=1)
-ticker = "AAPL"
+
 default_price = 0.0
 if ticker and buy_date:
     try:
@@ -37,3 +37,27 @@ if st.button("Add to Portfolio"):
 # Show current portfolio
 st.subheader("Current Portfolio")
 st.dataframe(st.session_state.portfolio[["Ticker", "Buy Date", "Buy Price", "Quantity"]])
+
+if not st.session_state.portfolio.empty:
+    tickers = st.session_state.portfolio["Ticker"].tolist()
+    start_date = min(st.session_state.portfolio["Buy Date"])
+    today = date.today()
+
+    # Fetch historical prices
+    data = yf.download(tickers, start=start_date, end=today)["Adj Close"]
+
+    # Calculate portfolio value over time
+    portfolio_values = pd.Series(0, index=data.index)
+    for i, row in st.session_state.portfolio.iterrows():
+        stock_data = data[row["Ticker"]]
+        stock_data = stock_data / stock_data.loc[row["Buy Date"]] * row["Buy Price"]  # normalize
+        portfolio_values += stock_data * row["Quantity"]
+
+    # Fetch benchmark (S&P 500)
+    sp500 = yf.download("^GSPC", start=start_date, end=today)["Adj Close"]
+    sp500 = sp500 / sp500.iloc[0] * portfolio_values.iloc[0]
+
+    # Plot
+    df_plot = pd.DataFrame({"Portfolio": portfolio_values, "S&P 500": sp500})
+    fig = px.line(df_plot, x=df_plot.index, y=df_plot.columns, title="Portfolio vs S&P 500")
+    st.plotly_chart(fig)
