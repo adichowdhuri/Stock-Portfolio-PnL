@@ -5,6 +5,8 @@ import pandas as pd
 import yfinance as yf
 from datetime import date, timedelta
 
+pnl_values = 0
+
 st.title("Portfolio PnL Dashboard")
 st.set_page_config(page_title="Portfolio PnL", page_icon="📈")
 
