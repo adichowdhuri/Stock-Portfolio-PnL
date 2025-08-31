@@ -54,7 +54,8 @@ if not st.session_state.portfolio.empty:
 
     # Fetch benchmark (S&P 500)
     sp500 = yf.download("^GSPC", start=start_date, end=today)["Close"]
-    sp500 = sp500 / sp500.iloc[0] * portfolio_values.iloc[0]
+    portfolio_values = portfolio_values.squeeze()
+    sp500 = sp500.squeeze()
 
     # Plot
     df_plot = pd.DataFrame({"Portfolio": portfolio_values, "S&P 500": sp500})
