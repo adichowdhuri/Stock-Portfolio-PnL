@@ -53,7 +53,7 @@ if not st.session_state.portfolio.empty:
         portfolio_values += stock_data * row["Quantity"]
 
     # Fetch benchmark (S&P 500)
-    sp500 = yf.download("^GSPC", start=start_date, end=today)["Adj Close"]
+    sp500 = yf.download("^GSPC", start=start_date, end=today)["Close"]
     sp500 = sp500 / sp500.iloc[0] * portfolio_values.iloc[0]
 
     # Plot
