@@ -118,11 +118,31 @@ total_pnl = current_market_value - initial_investment
 pnl_color = "#28B463" if total_pnl > 0 else "#C0392B" if total_pnl < 0 else "#7F8C8D"
 
 
-st.markdown(f"""
-        <h2 style='text-align: center; color: #2E86C1;'>Initial Investment: ${initial_investment:,.2f}</h2>
-        <h2 style='text-align: center; color: #28B463;'>Current Market Value: ${current_market_value:,.2f}</h2>
-        <h2 style='text-align: center; color: {pnl_color};'>PnL: ${total_pnl:,.2f}</h2>
-    """, unsafe_allow_html=True)
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.markdown(f"""
+            <div style='text-align: center;'>
+                <h3 style='color:#2E86C1;'>Initial Investment</h3>
+                <h2>${initial_investment:,.2f}</h2>
+            </div>
+        """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown(f"""
+            <div style='text-align: center;'>
+                <h3 style='color:#28B463;'>Current Market Value</h3>
+                <h2>${current_market_value:,.2f}</h2>
+            </div>
+        """, unsafe_allow_html=True)
+
+with col3:
+    st.markdown(f"""
+            <div style='text-align: center;'>
+                <h3 style='color:{pnl_color};'>PnL</h3>
+                <h2 style='color:{pnl_color};'>${total_pnl:,.2f}</h2>
+            </div>
+        """, unsafe_allow_html=True)
 
 # Show current portfolio
 st.subheader("Current Portfolio")
