@@ -5,6 +5,76 @@ import pandas as pd
 import yfinance as yf
 from datetime import date, timedelta
 
+#FUNCTIONS
+
+def flatten_multiindex(df):
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = [''.join([str(c) for c in col if c]).strip() for col in df.columns.values]
+    return df
+
+def pull_default_price(ticker, buy_date):
+    data = yf.download(ticker, start=buy_date, end=buy_date + timedelta(days=1))
+    default_price = float(round(data["Open"], 2).iloc[0].iloc[0])
+    return default_price
+
+def get_bought_market_value(ticker, buy_date, quantity, buy_price=None):
+    if not buy_price:
+        market_value = quantity * buy_price
+    else:
+        market_value = quantity * pull_default_price(ticker, buy_date)
+    return market_value
+
+def add_to_portfolio(ticker, buy_date, quantity, portfolio, buy_price = None):
+    if not buy_price:
+        buy_price = pull_default_price(ticker=ticker, buy_date=buy_date)
+    new_buy = pd.DataFrame({"Ticker":[ticker], 'Buy Date' : [buy_date],  'Quantity' : [quantity], 'Buy Price' : [buy_price], 'Buy MV' : [buy_price * quantity]})
+    portfolio = pd.concat([portfolio, new_buy], ignore_index=True)
+    return portfolio
+
+def generate_pnl(portfolio):
+
+    pnl_list = []
+
+    end_date = datetime.today().strftime('%Y-%m-%d')
+    
+    for idx, row in portfolio.iterrows():
+        ticker = row['Ticker']
+        start_date = row['Buy Date']
+        buy_price = row['Buy Price']
+        quantity = row['Quantity']
+
+        data = yf.download(ticker, start=start_date, end=end_date)
+        data = flatten_multiindex(data)
+        
+        close_col = [col for col in data.columns if col.startswith('Close')]
+        data = data[[close_col[0]]].rename(columns={close_col[0]: 'Close'})
+
+        data = data[['Close']]
+
+
+        # Calculate cumulative PnL
+        data['cum_pnl'] = (data['Close'] - buy_price) * quantity
+        
+        # Daily PnL change
+        data['daily_change'] = data['cum_pnl'].diff()
+        
+        # Add quantity and ticker info
+        data['ticker'] = ticker
+        data['quantity'] = quantity
+        
+        # Reset index and rename date column
+        data = data.reset_index().rename(columns={'Date': 'date'})
+        
+        pnl_list.append(data)
+
+    # Combine all transactions
+    pnl = pd.concat(pnl_list, ignore_index=True)
+
+    pnl = pnl[['date', 'ticker', 'Close', 'quantity', 'cum_pnl', 'daily_change']]
+    print(pnl.index)
+ 
+    return pd.DataFrame(pnl)
+
 
 st.title("Portfolio PnL Dashboard")
 st.set_page_config(page_title="Portfolio PnL", page_icon="📈")
@@ -21,9 +91,7 @@ quantity = st.number_input("Quantity", 1, step=1)
 default_price = 0.0
 if ticker and buy_date:
     try:
-        data = yf.download(ticker, start=buy_date, end=buy_date + timedelta(days=1), progress=False)
-        if not data.empty:
-            default_price = float(round(data["Open"], 2).iloc[0].iloc[0])
+        default_price = pull_default_price(ticker=ticker, buy_date=buy_date)
     except Exception as e:
         st.warning(f"Could not fetch price: {e}")
 
@@ -32,45 +100,29 @@ buy_price = st.number_input("Buy Price", value=default_price)
 
 if st.button("Add to Portfolio"):
     if ticker and buy_price:
-        new_row = pd.DataFrame({"Ticker": [ticker], "Buy Date": [buy_date], "Buy Price": [buy_price], "Quantity": [quantity]})
-        st.session_state.portfolio = pd.concat([st.session_state.portfolio, new_row], ignore_index=True)
+        add_to_portfolio(ticker=ticker, buy_date=buy_date, quantity=quantity, buy_price=buy_price)
 
 # Show current portfolio
 st.subheader("Current Portfolio")
 st.dataframe(st.session_state.portfolio)
 
 if not st.session_state.portfolio.empty:
-    tickers = st.session_state.portfolio["Ticker"].tolist()
-    start_date = min(st.session_state.portfolio["Buy Date"])
-    today = date.today()
-
-    # Fetch historical prices
-    data = yf.download(tickers, start=start_date, end=today)["Close"]
-
-    pnl_values = pd.Series(0.0, index=data.index)
-
-    # Calculate portfolio value over time
-    portfolio_values = pd.Series(0, index=data.index)
-    for i, row in st.session_state.portfolio.iterrows():
-        stock_data = data[row["Ticker"]]
-        pnl_values += (stock_data - row["Buy Price"]) * row["Quantity"]
-
-    # Fetch benchmark (S&P 500)
-    sp500 = yf.download("^GSPC", start=start_date, end=today)["Close"]
-    initial_investment = (st.session_state.portfolio["Buy Price"] * st.session_state.portfolio["Quantity"]).sum()
-
-    # Calculate how many units of S&P 500 you could buy on start_date
-    sp500_start_price = sp500.iloc[0]
-    sp500_units = initial_investment / sp500_start_price
-
-    # Calculate S&P PnL over time
-    sp500_pnl = (sp500 - sp500_start_price) * sp500_units
-
-
-    pnl_values = portfolio_values.squeeze()
-    sp500_pnl = sp500.squeeze()
-
+    PnL = generate_pnl(st.session_state.portfolio)
     # Plot
-    df_plot = pd.DataFrame({"Portfolio": pnl_values, "S&P 500": sp500_pnl})
-    fig = px.line(df_plot, x=df_plot.index, y=df_plot.columns, title="Portfolio vs S&P 500")
+    fig = px.line(
+    PnL,
+    x='date',
+    y='cum_pnl',
+    color='ticker',
+    title='Cumulative PnL per Ticker',
+    markers=True,
+    hover_data=['Close', 'quantity', 'daily_change']
+    )
+
+    fig.update_layout(
+        xaxis_title='Date',
+        yaxis_title='Cumulative PnL ($)',
+        hovermode='x unified'
+    )
+
     st.plotly_chart(fig)
