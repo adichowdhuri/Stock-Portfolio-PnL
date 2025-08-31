@@ -57,7 +57,7 @@ if not st.session_state.portfolio.empty:
     sp500 = sp500 / sp500.iloc[0] * portfolio_values.iloc[0]
 
     # Plot
-    print(portfolio_values, sp500)
+    print(portfolio_values)
     df_plot = pd.DataFrame({"Portfolio": portfolio_values, "S&P 500": sp500})
     fig = px.line(df_plot, x=df_plot.index, y=df_plot.columns, title="Portfolio vs S&P 500")
     st.plotly_chart(fig)
