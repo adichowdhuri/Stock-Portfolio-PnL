@@ -126,3 +126,6 @@ if not st.session_state.portfolio.empty:
     )
 
     st.plotly_chart(fig)
+
+st.subheader("Current PnL")
+st.dataframe(PnL)
