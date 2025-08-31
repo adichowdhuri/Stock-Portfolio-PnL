@@ -3,7 +3,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import yfinance as yf
-from datetime import date
+from datetime import date, timedelta
 
 st.title("Portfolio PnL Dashboard")
 st.set_page_config(page_title="Portfolio PnL", page_icon="📈")
@@ -17,13 +17,17 @@ ticker = st.text_input("Stock Ticker (e.g., AAPL)")
 buy_date = st.date_input("Buy Date", date(2023, 1, 1))
 quantity = st.number_input("Quantity", 1, step=1)
 
-default_price = None
+default_price = 0.0
 if ticker and buy_date:
-    data = yf.download(ticker, start=buy_date, end=buy_date)
-    if not data.empty:
-        default_price = round(data.iloc[0]["Open"], 2)
+    try:
+        data = yf.download(ticker, start=buy_date, end=buy_date + timedelta(days=1), progress=False)
+        if not data.empty:
+            default_price = round(data.iloc[0]["Open"], 2)
+    except Exception as e:
+        st.warning(f"Could not fetch price: {e}")
 
-buy_price = st.number_input("Buy Price", value=default_price if default_price else 0.0)
+# Allow user to override default price
+buy_price = st.number_input("Buy Price", value=default_price)
 
 if st.button("Add to Portfolio"):
     if ticker and buy_price:
