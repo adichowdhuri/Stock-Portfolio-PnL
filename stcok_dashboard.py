@@ -18,7 +18,7 @@ def pull_default_price(ticker, buy_date):
     return default_price
 
 def get_bought_market_value(ticker, buy_date, quantity, buy_price=None):
-    if not buy_price:
+    if buy_price:
         market_value = quantity * buy_price
     else:
         market_value = quantity * pull_default_price(ticker, buy_date)
@@ -100,7 +100,7 @@ buy_price = st.number_input("Buy Price", value=default_price)
 
 if st.button("Add to Portfolio"):
     if ticker and buy_price:
-        add_to_portfolio(ticker=ticker, buy_date=buy_date, quantity=quantity, buy_price=buy_price, portfolio=st.session_state.portfolio)
+        st.session_state.portfolio = add_to_portfolio(ticker=ticker, buy_date=buy_date, quantity=quantity, buy_price=buy_price, portfolio=st.session_state.portfolio)
 
 # Show current portfolio
 st.subheader("Current Portfolio")
